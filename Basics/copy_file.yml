@@ -1,0 +1,22 @@
+# Copy a File to Remote Hosts
+
+# Write a playbook to copy a local configuration file to /etc/ on all remote servers.
+
+---
+# linux server
+- name: copy file 
+  hosts: all 
+  gater_facts: no
+  tasks: 
+    - name: using copy module
+      copy: 
+        src: ./file.cnf
+        dest: /etc/file.cnf
+        mode: '0777'
+        owner: 'root'
+        group: 'root'
+      register: copy_file
+
+    - debug: 
+        var: copy_file
+

@@ -1,0 +1,93 @@
+# Write a Playbook to Install Apache and Start the Service
+
+# Question: Create a playbook that installs Apache (httpd on RHEL / apache2 on Debian) and ensures it is started and enabled.
+
+---
+- name: creating the dynamic host
+  hosts: localhost 
+  gather_facts: no
+  tasks: 
+    - name: task for adding host
+      add_host: 
+        name: "{{ target_host }}"
+        groups: "webserver"
+
+- name: connecting the hosts
+  hosts: webserver
+  # gather_facts: yes
+  become: true
+  tasks: 
+    - name: installing the apache in RHEL
+      yum: 
+        name: httpd
+        state: present
+      register: install_httpd_log
+      when: ansible_os_family == 'RedHat'
+    
+    - name: debug the RHEL installation
+      debug:
+        var: install_httpd_log
+      when: install_httpd_log is defined
+
+    - name: installing the apache2 in RHEL
+      apt: 
+        name: apache2
+        state: present
+      register: install_apache2_log
+      when: ansible_os_family == 'Debian'
+    
+    - name: debug the RHEL installation
+      debug:
+        var: install_apache2_log
+      when: install_apache2_log is defined
+
+    - name: checking the service status 
+      service:
+        name: "httpd"
+        state: started
+        enabled: yes
+      register: httpd_service_status
+
+    - name: display the httpd service result
+      debug:
+        var: httpd_service_status
+
+    - name: checking the service status 
+      service:
+        name: "apache2"
+        state: started
+        enabled: yes
+      register: apache2_service_status
+
+    - name: display the apache2 service result
+      debug:
+        var: apache2_service_status
+
+
+
+
+# short form - installs Apache (httpd on RHEL / apache2 on Debian) and ensures it is started and enabled.
+
+- name: Installation of apache
+  hosts: webservers
+  become: true
+  tasks: 
+    - name: installing using package
+      package: 
+        name: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+      register: installation_log
+    
+    - debug: 
+        var: installation_log
+      when: installation_log is defined
+
+    - name: start the service and enabled
+      service: 
+        name: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+        state: started
+        enabled: yes
+      register: serivce_status
+
+    - debug: 
+        var: serivce_status 
+      when: serivce_status is defined
