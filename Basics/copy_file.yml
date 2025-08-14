@@ -4,19 +4,20 @@
 
 ---
 # linux server
-- name: copy file 
-  hosts: all 
-  gater_facts: no
+- name: copy file playbook
+  hosts: all
+  gather_facts: no
   tasks: 
-    - name: using copy module
+    - name: copying to remote server
       copy: 
-        src: ./file.cnf
-        dest: /etc/file.cnf
-        mode: '0777'
+        src: '/tmp/config.cnf'
+        dest: '/etc/config.cnf'
+        mode: '0644'
         owner: 'root'
         group: 'root'
-      register: copy_file
+      register: copy_status
 
-    - debug: 
-        var: copy_file
+    - debug:
+        var: copy_status
+      when: copy_status is defined
 
