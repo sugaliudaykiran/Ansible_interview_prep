@@ -1,0 +1,22 @@
+# Create a User with a Password
+
+# Question: Create a playbook to add a user devops with a pre-defined password.
+
+---
+- name: creating a user using playbook
+  hosts: all
+  gather_facts: no
+  vars:
+    username: "devops"
+    password: "{{ Pass@word  | password_hash('sha512')}} " # Ansible password_hash filter, which will hash the given password using the SHA-512 algorithm
+  tasks: 
+    - name: creation of user
+      user: 
+        name: "{{ username }}"
+        password: "{{ password }}"
+        # state: present  # default it will be present 
+      register: user_log
+    
+    - debug: 
+        var: user_log
+      when: user_log is defined

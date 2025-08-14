@@ -1,0 +1,28 @@
+# Gather Facts and Display Specific Information
+
+# Question: Display OS version and IP address of each host.
+
+---
+- name: fetch the os version and ip details
+  hosts: all
+  gather_facts: true
+  tasks: 
+    - setup: 
+      register: gather_details
+
+    - debug: 
+        var: gather_details
+      when: gather_details is defined
+
+
+# shortest form
+
+---
+- name: fetch the os version and ip details
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: display items
+      debug:
+        msg: "Host: {{ inventory_hostname }} | OS: {{ ansible_distribution }} {{ ansible_distribution_version }} |  IP: {{ ansible_default_ipv4.address }}"
+
